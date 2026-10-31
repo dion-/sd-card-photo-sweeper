@@ -8,8 +8,7 @@ Needs macOS 14 or later and Apple's Command Line Tools (free; full Xcode isn't n
 
 ```sh
 xcode-select --install                     # once per Mac, if the tools aren't installed yet
-gh auth login -p https -w                  # once per Mac (GitHub CLI: `brew install gh`); the repo is private
-gh repo clone dion-/sd-card-photo-sweeper ~/sd-card-photo-sweeper
+git clone https://github.com/dion-/sd-card-photo-sweeper.git ~/sd-card-photo-sweeper
 ~/sd-card-photo-sweeper/build.sh install
 ```
 
