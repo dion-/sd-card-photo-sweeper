@@ -23,7 +23,7 @@ enum Entry {
             // `--demo [MB/s] [prior MB/s]`: simulated import of 150 RAWs (~45 MB each).
             let num = { (k: Int) -> Double? in i + k < args.count ? Double(args[i + k]) : nil }
             let items = (1...150).map { n in
-                let f = CardFile(url: URL(fileURLWithPath: "/Volumes/DEMO_CARD/DCIM/DSCF\(n).RAF"),
+                let f = CardFile(url: URL(fileURLWithPath: "/Volumes/Untitled/DCIM/DSCF\(n).RAF"),
                                  key: FileKey(name: "DSCF\(n).RAF", size: Int64.random(in: 38_000_000...52_000_000), mtime: 0))
                 return ImportItem(raw: f, jpeg: nil)
             }
@@ -87,7 +87,8 @@ struct MenuView: View {
             .controlSize(.small)
         }
         .toggleStyle(.checkbox)
+        .focusEffectDisabled() // no focus ring on the first checkbox when the popover opens
         .padding(12)
-        .frame(width: 320)
+        .frame(width: 360)
     }
 }

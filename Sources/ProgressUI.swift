@@ -162,6 +162,8 @@ final class StatusController: NSObject, NSPopoverDelegate {
         if !pinned { NSApp.activate() } // click-away closing needs the app active; auto-open must not steal focus
         if !popover.isShown, let button = item?.button {
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+            // Don't give the first checkbox keyboard focus (and its focus ring) on open.
+            DispatchQueue.main.async { self.popover.contentViewController?.view.window?.makeFirstResponder(nil) }
         }
         refresh()
     }

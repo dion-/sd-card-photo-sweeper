@@ -551,7 +551,8 @@ final class Importer: ObservableObject {
 
     func runDemo(_ d: Demo) {
         demo = d
-        Task { await importCard(URL(fileURLWithPath: "/Volumes/DEMO_CARD")) }
+        openAtLogin = true // demo shows the default settings
+        Task { await importCard(URL(fileURLWithPath: "/Volumes/Untitled")) }
     }
 
     private func simulateBatch(_ batch: [ImportItem]) async throws -> [String] {
