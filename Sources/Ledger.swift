@@ -22,7 +22,7 @@ struct LedgerEntry: Codable {
 final class Ledger {
     static let defaultURL = FileManager.default
         .urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-        .appendingPathComponent("SDImport/ledger.jsonl")
+        .appendingPathComponent("SD Card Photo Sweeper/ledger.jsonl")
 
     let url: URL
     /// name+size → known mtimes and the asset each became. Usually one per name+size.
@@ -33,7 +33,18 @@ final class Ledger {
 
     init(url: URL = Ledger.defaultURL) {
         self.url = url
+        if url == Ledger.defaultURL { Self.migrateFromOldName() }
         load()
+    }
+
+    /// The app used to be called "SD Import". Move its ledger over, so nothing is imported twice.
+    private static func migrateFromOldName() {
+        let support = defaultURL.deletingLastPathComponent().deletingLastPathComponent()
+        let old = support.appendingPathComponent("SDImport")
+        let new = defaultURL.deletingLastPathComponent()
+        let fm = FileManager.default
+        guard fm.fileExists(atPath: old.path), !fm.fileExists(atPath: new.path) else { return }
+        try? fm.moveItem(at: old, to: new)
     }
 
     /// FAT and exFAT cards store local time, so the mtime macOS reports moves when the Mac's time zone changes.

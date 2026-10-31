@@ -4,7 +4,7 @@ import UserNotifications
 @main
 enum Entry {
     static func main() {
-        // `SDImport --scan /Volumes/CARD` prints what an insert would import, then exits. It writes nothing.
+        // `SDCardPhotoSweeper --scan /Volumes/CARD` prints what an insert would import, then exits. It writes nothing.
         let args = CommandLine.arguments
         if let i = args.firstIndex(of: "--scan"), i + 1 < args.count {
             let volume = URL(fileURLWithPath: args[i + 1])
@@ -31,11 +31,11 @@ enum Entry {
                 Importer.shared.runDemo(.init(items: items, speed: (num(1) ?? 90) * 1e6, prior: num(2).map { $0 * 1e6 }))
             }
         }
-        SDImportApp.main()
+        PhotoSweeperApp.main()
     }
 }
 
-struct SDImportApp: App {
+struct PhotoSweeperApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
 
     // The menu-bar item is AppKit (StatusController), because SwiftUI's MenuBarExtra can't open its popover by itself.

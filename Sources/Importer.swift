@@ -99,6 +99,7 @@ final class Importer: ObservableObject {
     }
 
     private init() {
+        Self.migrateSettingsFromOldName()
         UserDefaults.standard.register(defaults: ["removeFromCard": true])
         removeFromCard = UserDefaults.standard.bool(forKey: "removeFromCard")
     }
@@ -168,7 +169,7 @@ final class Importer: ObservableObject {
 
         let canAdd = demo != nil ? true : [.authorized, .limited].contains(await PHPhotoLibrary.requestAuthorization(for: .addOnly))
         guard canAdd else {
-            finish(Outcome(kind: .failure, title: "SD Import can't add to Photos",
+            finish(Outcome(kind: .failure, title: "SD Card Photo Sweeper can't add to Photos",
                            line1: "Allow it in System Settings › Privacy & Security › Photos.",
                            line2: "Then reinsert the card."))
             return
@@ -183,7 +184,7 @@ final class Importer: ObservableObject {
         let removing = removeFromCard && !readOnly && canRead
         let keptReason: String? = !removeFromCard || demo != nil ? nil
             : readOnly ? "The card is locked, so nothing was removed from it."
-            : !canRead ? "Nothing was removed from the card: allow SD Import full access in Settings › Privacy & Security › Photos."
+            : !canRead ? "Nothing was removed from the card: allow SD Card Photo Sweeper full access in Settings › Privacy & Security › Photos."
             : nil
 
         let dcim = volume.appendingPathComponent("DCIM")
@@ -401,7 +402,7 @@ final class Importer: ObservableObject {
         case .operationInterrupted: return "Photos was interrupted. Reinsert the card to try again."
         case .libraryVolumeOffline: return "The drive holding your Photos library isn't connected."
         case .switchingSystemPhotoLibrary, .relinquishingLibraryBundleToWriter: return "The Photos library was moved or switched during the import."
-        case .accessRestricted, .accessUserDenied: return "SD Import isn't allowed to add to Photos. Check System Settings › Privacy & Security › Photos."
+        case .accessRestricted, .accessUserDenied: return "SD Card Photo Sweeper isn't allowed to add to Photos. Check System Settings › Privacy & Security › Photos."
         default: return "Photos error \(e.code): \(e.localizedDescription)"
         }
     }
@@ -571,6 +572,16 @@ final class Importer: ObservableObject {
             }
         }
         FileHandle.standardError.write(Data(out.utf8))
+    }
+
+    /// The app used to be called "SD Import" (dev.dion.SDImport). Carry over its settings and saved card speeds once.
+    private static func migrateSettingsFromOldName() {
+        let d = UserDefaults.standard
+        guard !d.bool(forKey: "migratedFromSDImport"), let old = UserDefaults(suiteName: "dev.dion.SDImport") else { return }
+        for (key, value) in old.dictionaryRepresentation() where key.hasPrefix("speed.") || key == "removeFromCard" {
+            d.set(value, forKey: key)
+        }
+        d.set(true, forKey: "migratedFromSDImport")
     }
 
     // MARK: Saved speeds

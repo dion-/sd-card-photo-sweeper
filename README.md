@@ -1,6 +1,6 @@
-# SD Import
+# SD Card Photo Sweeper
 
-Insert an SD card into the Mac. A menu-bar app imports every RAW into Photos, checks each copy byte for byte, removes the verified photos from the card, ejects it, and posts a notification.
+A macOS app for Apple Photos. Insert an SD card into the Mac. A menu-bar app imports every RAW into Photos, checks each copy byte for byte, removes the verified photos from the card, ejects it, and posts a notification.
 
 ## Install on a Mac
 
@@ -9,8 +9,8 @@ Needs macOS 14 or later and Apple's Command Line Tools (free; full Xcode isn't n
 ```sh
 xcode-select --install                     # once per Mac, if the tools aren't installed yet
 gh auth login -p https -w                  # once per Mac (GitHub CLI: `brew install gh`); the repo is private
-gh repo clone dion-/sd-import ~/sd-import
-~/sd-import/build.sh install
+gh repo clone dion-/sd-card-photo-sweeper ~/sd-card-photo-sweeper
+~/sd-card-photo-sweeper/build.sh install
 ```
 
 `build.sh install` builds the app, copies it to `/Applications`, and opens it. Then:
@@ -18,20 +18,20 @@ gh repo clone dion-/sd-import ~/sd-import
 1. Allow notifications when asked.
 2. Insert a card. Allow both Photos prompts: "add" to import, and full access, which is needed to check each copy before removing it from the card.
 
-The app opens at login from then on. To update later: `git -C ~/sd-import pull && ~/sd-import/build.sh install`.
+The app opens at login from then on. To update later: `git -C ~/sd-card-photo-sweeper pull && ~/sd-card-photo-sweeper/build.sh install`.
 
 **Signing.** `build.sh` signs with the first "Apple Development" certificate in the keychain (override with `SIGN_ID=…`). On a Mac without one it signs ad hoc, which works the same, but macOS may ask for Photos access again after each rebuild.
 
-**Ledger.** Each Mac keeps its own ledger of imported files (`~/Library/Application Support/SDImport/ledger.jsonl`). Verified photos are removed from the card, so a new Mac with an empty ledger won't import them twice.
+**Ledger.** Each Mac keeps its own ledger of imported files (`~/Library/Application Support/SD Card Photo Sweeper/ledger.jsonl`). Verified photos are removed from the card, so a new Mac with an empty ledger won't import them twice.
 
 Tools:
 
 ```sh
-SDImport --scan /Volumes/CARD   # what an insert would import; writes nothing
-SDImport --demo [MB/s] [saved MB/s]      # real UI and timing on a simulated card; touches neither Photos nor the ledger
+SDCardPhotoSweeper --scan /Volumes/CARD   # what an insert would import; writes nothing
+SDCardPhotoSweeper --demo [MB/s] [saved MB/s]      # real UI and timing on a simulated card; touches neither Photos nor the ledger
 ```
 
-(`SDImport` is `"/Applications/SD Import.app/Contents/MacOS/SDImport"`.)
+(`SDCardPhotoSweeper` is `"/Applications/SD Card Photo Sweeper.app/Contents/MacOS/SDCardPhotoSweeper"`.)
 
 ## Code
 
@@ -42,7 +42,7 @@ SDImport --demo [MB/s] [saved MB/s]      # real UI and timing on a simulated car
 | `Sources/Importer.swift` | Mount watching, queue, batches, verify and remove, eject, time estimate |
 | `Sources/Verifier.swift` | SHA-256 of card files and of the originals in Photos |
 | `Sources/Scanner.swift` | Card detection (removable/ejectable + `DCIM/`), DCIM walk, RAW+JPEG pairing |
-| `Sources/Ledger.swift` | `~/Library/Application Support/SDImport/ledger.jsonl` |
+| `Sources/Ledger.swift` | `~/Library/Application Support/SD Card Photo Sweeper/ledger.jsonl` |
 
 ## What you see
 
@@ -91,7 +91,7 @@ A failed batch counts its photos as failed, and the import moves on to the next 
 3. Check: the progress window appears, Photos shows the photos, the card ejects, and the window says "Checked each copy in Photos, then removed N from the card."
 4. Reinsert the card. Its `DCIM` should no longer have those RAWs, and the window should say "No new photos".
 5. Check that the server's archive receives the RAWs after iCloud uploads them.
-6. Record the speed from the notification here. First card (31 Oct 2026): **59 MB/s** end to end, 374 RAFs (Fujifilm, ~50 MB each).
+6. Record the speed from the notification here. First card (31 Oct 2026, 374 Fujifilm RAFs, ~50 MB each): **59 MB/s** on the first run, **96 MB/s** on the second, end to end.
 
 If Photos or Image Capture opens by itself when a card goes in, turn that off: in Photos' Import view, untick "Open Photos" for the card, or in Image Capture set "Connecting this device opens: No application".
 

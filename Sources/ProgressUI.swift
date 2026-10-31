@@ -192,7 +192,7 @@ final class StatusController: NSObject, NSPopoverDelegate {
 
         let symbol = importer.isBusy ? "sdcard.fill" : failed && !popover.isShown ? "exclamationmark.triangle" : "sdcard"
         if button.image?.name() != symbol {
-            let image = NSImage(systemSymbolName: symbol, accessibilityDescription: "SD Import")
+            let image = NSImage(systemSymbolName: symbol, accessibilityDescription: "SD Card Photo Sweeper")
             image?.isTemplate = true
             image?.setName(symbol)
             button.image = image
