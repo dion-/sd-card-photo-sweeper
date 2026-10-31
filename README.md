@@ -8,7 +8,8 @@ Needs macOS 14 or later and Apple's Command Line Tools (free; full Xcode isn't n
 
 ```sh
 xcode-select --install                     # once per Mac, if the tools aren't installed yet
-gh repo clone dion-/sd-import ~/sd-import  # or: git clone git@github.com:dion-/sd-import.git ~/sd-import
+gh auth login -p https -w                  # once per Mac (GitHub CLI: `brew install gh`); the repo is private
+gh repo clone dion-/sd-import ~/sd-import
 ~/sd-import/build.sh install
 ```
 
